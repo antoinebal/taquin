@@ -1,0 +1,34 @@
+1.a liste de liste
+b. pareil mais avec des listes de taille 4
+c.initial_state(S),
+|    rule(U, 1, S, S2).
+S = [[b, h, c], [a, f, d], [g, vide, e]],
+U = up,
+S2 = [[b, h, c], [a, vide, d], [g, f, e]] 
+Unknown action: , (h for help)
+Action? 
+Unknown action: , (h for help)
+Action? ;
+S = [[b, h, c], [a, f, d], [g, vide, e]],
+U = left,
+S2 = [[b, h, c], [a, f, d], [vide, g, e]] ;
+S = [[b, h, c], [a, f, d], [g, vide, e]],
+U = right,
+S2 = [[b, h, c], [a, f, d], [g, e, vide]] ;
+
+
+d. initial_state(S),
+findall(Y, rule(Direction, 1, S, Y), Res).
+S = [[b, h, c], [a, f, d], [g, vide, e]],
+Res = [[[b, h, c], [a, vide, d], [g, f, e]], [[b, h, c], [a, f, d], [vide, g, e]], [[b, h, c], [a, f, d], [g, e, vide]]].
+
+
+e. initial_state(S),
+findall([Direction, Y], rule(Direction, 1, S, Y), Res).
+S = [[b, h, c], [a, f, d], [g, vide, e]],
+Res = [[up, [[b, h, c], [a, vide, d], [g, f, e]]], [left, [[b, h, c], [a, f, d], [vide, g|...]]], [right, [[b, h, c], [a, f|...], [g|...]]]].
+
+
+
+
+
