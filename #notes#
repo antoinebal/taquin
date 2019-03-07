@@ -29,6 +29,9 @@ S = [[b, h, c], [a, f, d], [g, vide, e]],
 Res = [[up, [[b, h, c], [a, vide, d], [g, f, e]]], [left, [[b, h, c], [a, f, d], [vide, g|...]]], [right, [[b, h, c], [a, f|...], [g|...]]]].
 
 
+rbailonr@laas.fr
+
+
 
 
 
