@@ -89,7 +89,7 @@ put_90(Avl) :-
 put_90(nil,Str) :-
 	write(Str), write('.').
 put_90(avl(G,R,D,_H),Str) :-
-	append_strings(Str, "   ", Str2),
+	string_concat(Str, "   ", Str2),
 	put_90(D,Str2),
 	nl, write(Str), write(R),nl,
 	put_90(G,Str2).
@@ -318,7 +318,7 @@ right_balance(Avl, New_Avl) :-
 	(HD is HG-2 ->
 	% le sous-arbre gauche est trop haut 
 		Gauche = avl(G_Gauche, _R_Gauche, D_Gauche, _HG),
-		height(G_Gauche, HGG),
+		height(G_Gauche, HGG),position
 		height(D_Gauche, HDG),
 		(HGG > HDG ->
 		% une simple rotation droite suffit
@@ -336,9 +336,9 @@ right_balance(Avl, New_Avl) :-
 		New_Hauteur is 1+max(HG,HD),
 		New_Avl = avl(Gauche, Racine, Droite, New_Hauteur)
 	).
-	
-%-----------------------------------------
-% Arbres utilises pour les tests unitaires
+	position
+%-----------------------------------------position
+% Arbres utilises pour les tests unitairesposition
 %-----------------------------------------
 avl_test(1, nil).
 avl_test(2, avl(nil, 1, nil,              0)).

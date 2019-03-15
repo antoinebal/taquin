@@ -92,7 +92,7 @@ exchange(X,Y,[Z|List1],  [Z|List2] ):-
 vertical_permutation(X,Y,S1,S2) :-
    append(Above, [Line1,Line2|Below], S1), % decompose S1
    delete(N,X,Line1,Rest1),    % enleve X en position N a Line1,   donne Rest1
-   delete(N,Y,Line2,Rest2),    % enleve Y en position N a Line2,   donne Rest2
+   delete1((N,Y,Line2,Rest2),    % enleve Y en position N a Line2,   donne Rest2
    delete(N,Y,Line3,Rest1),    % insere Y en position N dans Rest1 donne Line3
    delete(N,X,Line4,Rest2),    % insere X en position N dans Rest2 donne Line4
    append(Above, [Line3,Line4|Below], S2). % recompose S2 
@@ -114,13 +114,10 @@ delete(N,X,[Y|L], [Y|R]) :-
 
 diff_element(E1, E1, 0).
 diff_element(vide, E2, 0):-
-E2\=vide.
-diff_element(E1, vide, 0):-
-E1\=vide.
+E2\=vide.  %Si on veut 4 pour heuristique1 on supprime diffelement (E1,vide) et E2/= vide du prochain diff element ou mettre direct 1 ici 
 diff_element(E1, E2, 1):-
 E1\=E2,
-E1\=vide,
-E2\=vide.
+E1\=vide.
 
 diff_ligne([], [], 0).
 diff_ligne([E1|L1], [E2|L2], X) :-
@@ -136,7 +133,7 @@ diff_matrice([L1|M1], [L2|M2], X):-
    
 heuristique(U,H) :-
    heuristique1(U, H).  % choisir l'heuristique 
-%   heuristique2(U, H).  % utilisee ( 1 ou 2)  
+%   heuristique2(U, H).   utilisee ( 1 ou 2)  
    
    %****************
    %HEURISTIQUE no 1
@@ -145,7 +142,7 @@ heuristique(U,H) :-
    % Calcul du nombre de pieces mal placees dans l'etat courant U
    % par rapport a l'etat final F
 
-    heuristique1(U, H) :- 
+    heuristique1(U, H) :-    % Verifier qu'on doit bien trouver 3 , et pas 4 dépend du comptage de mouvement sur le vide ou non 
 		final_state(F),
 		diff_matrice(U, F, H).    
 
@@ -181,7 +178,7 @@ heuristique(U,H) :-
 
 
 %situation que l'on va développer ensuite (suppress_min existe dejà)
-recherche_suppression_min_p(P, Q
+%recherche_suppression_min_p(P, Q
 
 
   
