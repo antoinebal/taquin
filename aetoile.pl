@@ -50,18 +50,28 @@ Predicat principal de l'algorithme :
 %recherche et suppression de l‘état Uqui minimise fU)
 %UFMin etat de f minimal 
 recherche_et_suppr_f_u_min(Avl, NewAvl, UFMin):-
-	suppress_min([X,UFMin] , Avl, NewAvl).
+	suppress_min([_,UFMin] , Avl, NewAvl).
+
 %peut etre tout récupérer au lieu de seulement U : suppress_min(UFMin , Avl, NewAvl).
 	
 %pour chaque successeur d’un étatUqui vient d’être développé, test d'appartenanceà P et test d'appartenanceà Q	
+
+
 	
 
 main :-
 	% initialisations Pf, Pu et Q 
-
+	initial_state(S0),
+	empty(Pu0),
+	empty(Pf0),
+	empty(Q),
+	heuristique(S0, H0),
+	insert([[0, H0, 0], S0], Pf0, Pf),
+	insert([S0, [0, H0, 0], nil, nil], Pu0, Pu)
+	
 	% lancement de Aetoile
 
-	true.   %********
+	.   %********
 			% A FAIRE
 			%********
 
@@ -69,10 +79,29 @@ main :-
 
 %*******************************************************************************
 
-aetoile(Pf, Ps, Qs) :-
-	true.   %********
-			% A FAIRE
-			%********
+expand(Successeurs, Fs, Hs, Gs, Gu):-
+	final_state(Sf),
+	findall(H, (member(S, Successeurs), 
+
+
+aetoile(nil, nil, _) :-
+	writeln("PAS de SOLUTION: L’ETAT FINAL N’EST PAS ATTEIGNABLE!"),
+
+aetoile(Pf, _, _):-
+	final_state(Sf),
+	echerche_et_suppr_f_u_min(Pf, _, UFMin),
+	UFMin=Sf,
+	affiche_solution(Q).
+
+aetoile(Pf, Pu, Qs) :-
+	%on cherche et supprime le u de f min
+	recherche_et_suppr(Pf, NewPf, UFMin),
+	 %on supprime le noeud frère dans Pu
+	suppress([UFMin, _, _, _], Pu, NewPs),
+	
+
+	%on cherche les successeurs
+	successeurs(UFMin, Successeurs),
 	
 
 	
