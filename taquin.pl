@@ -85,8 +85,9 @@ rule(left, 1, S1, S2) :-
 rule(right,1, S1, S2) :-
    horizontal_permutation(vide,_X,S1,S2).
 
-successeurs(S1, L2) :-
-	findall(S2, rule(_, 1, S1, S2), L2).
+% Rajout quand on faisait a* : ermet de renvoyer la liste des successeurs : liste etat atteignables en un coup 
+successeursEtActions(S1, L2) :-
+	findall([S2, Action], rule(Action, 1, S1, S2), L2).
 
    %***********************
    % Deplacement horizontal            
