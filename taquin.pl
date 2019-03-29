@@ -155,7 +155,7 @@ delete(N,X,[Y|L], [Y|R]) :-
 	*/
 
 	
-	coordonnees([L,C], Mat, Elt) :- true.    %********
+	%coordonnees([L,C], Mat, Elt) :- true.    %********
 											 % A FAIRE
 											 %********
 
@@ -163,7 +163,18 @@ delete(N,X,[Y|L], [Y|R]) :-
    %*************
    % HEURISTIQUES
    %*************
+
+
+heuristique(U,H) :-
+   heuristique1(U, H).  % choisir l'heuristique 
+%   heuristique2(U, H).   utilisee ( 1 ou 2) 
    
+
+
+   %****************
+   %HEURISTIQUE no 1
+   %****************
+
 diff_element(E1, E1, 0).
 diff_element(vide, E2, 0):-
 E2\=vide.  %Si on veut 4 pour heuristique1 on supprime diffelement (E1,vide) et E2/= vide du prochain diff element ou mettre direct 1 ici 
@@ -182,15 +193,7 @@ diff_matrice([L1|M1], [L2|M2], X):-
 	diff_ligne(L1, L2, X1),
 	diff_matrice(M1, M2, X2),
 	X is X2+X1.
-   
-heuristique(U,H) :-
-   heuristique1(U, H).  % choisir l'heuristique 
-%   heuristique2(U, H).   utilisee ( 1 ou 2)  
-   
-   %****************
-   %HEURISTIQUE no 1
-   %****************
-   
+     
    % Calcul du nombre de pieces mal placees dans l'etat courant U
    % par rapport a l'etat final F
 
@@ -205,7 +208,7 @@ heuristique(U,H) :-
    % Somme sur l'ensemble des pieces des distances de Manhattan
    % entre la position courante de la piece et sa positon dans l'etat final
 	
-	matrix(Matrix, I, J, Value) :-
+	matrix(Matrix, I, J, Value) :- % Coordonnees matrice
     nth1(I, Matrix, Row),
     nth1(J, Row, Value).
 	
