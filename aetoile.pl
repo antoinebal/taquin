@@ -36,7 +36,7 @@ Predicat principal de l'algorithme :
 				g et f 
 			sinon on ne touche pas a Pf
 		si S est entierement nouveau on l'insere dans Pf et dans Ps
-	- appelle recursivement etoile avec les nouvelles valeurs NewPF, NewPs, NewQs
+	- appelle recursivement etoile avec les nouvelles valeurs Pf2, NewPs, NewQs
 
 */
 
@@ -97,11 +97,11 @@ sommeListe([H1|T1], [H2|T2], [H3|T3]) :-
 	H3 is H2+H1,
 	sommeListe(T1, T2, T3).
 
-loop_successors([],[[],[],[]],Pu,Pf,Q,Pu,Pf,Q,_,_). % y'avait [] pour F,HG et actions, false direct, avec _ met quelques trucs avant ([[],[],[]] pour F,H,H c'est ok)
+loop_successors([],[[],[],[]],Pu,Pf,Pu,Pf, _, _, _). % y'avait [] pour F,HG et actions, false direct, avec _ met quelques trucs avant ([[],[],[]] pour F,H,H c'est ok)
 %on a besoin des actions, du pere
-loop_successors([S1|Succ], [[F|Fs], [H|Hs], [G|Gs]], Pu0, Pf0, Q0, Pu, Pf, Q, Pere, [Action|Suite]) :-
-	traiter_successeur(S1, [F, H, G], Pu0, Pf0, Q0, Pu1, Pf1, Q1, Pere, Action),
-	loop_successors(Succ, [Fs, Hs, Gs], Pu1, Pf1, Q1, Pu, Pf, Q, Pere, Suite).
+loop_successors([S1|Succ], [[F|Fs], [H|Hs], [G|Gs]], Pu0, Pf0, Pu, Pf, Q, Pere, [Action|Suite]) :-
+	traiter_successeur(S1, [F, H, G], Pu0, Pf0, Pu1, Pf1, Q, Pere, Action),
+	loop_successors(Succ, [Fs, Hs, Gs], Pu1, Pf1, Pu, Pf, Q, Pere, Suite).
 %%
 %traiter_successeur(Succ, [F, H, G], Pu0, Pf0, Q0, Pu1, Pf1, Q1, Pere, Action) :-
 %	belongs([Succ, _, _, _], Q0). % ON a deja dev l'etat : on passe au successeur suivant !
@@ -113,8 +113,8 @@ loop_successors([S1|Succ], [[F|Fs], [H|Hs], [G|Gs]], Pu0, Pf0, Q0, Pu, Pf, Q, Pe
 %	compareEtats(Succ, FOld, HOld, GOld, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pu1, Pere, Action).
 
 %% 
-traiter_successeur(Succ, [FNew, HNew, GNew], Pu0, Pf0, Q0, Pu1, Pf1, Q0, Pere, Action) :-
-	(belongs([Succ, _, _, _], Q0) -> Pu1 = Pu0 ,
+traiter_successeur(Succ, [FNew, HNew, GNew], Pu0, Pf0, Pu1, Pf1, Q, Pere, Action) :-
+	(belongs([Succ, _, _, _], Q) -> Pu1 = Pu0 ,
 									Pf1 = Pf0						 %IF ce successeur est connu dans Q, on l'oublie, on renvoi les arbres déjà présents
 		; %else 
 	 	(belongs([Succ, [FOld,HOld,GOld], _, _],Pu0) -> %if S connu dans Pu -> garde la meilleure eval ds pf et pu 
@@ -207,27 +207,27 @@ aetoile(Pf, Pu, Q):-  %cas trivial , solution trouvée et à afficher, le min de
 	recherche_et_suppr_f_u_min(Pf, _, UFMin),
 	UFMin==Sf,
 
-	suppress([UFMin, [FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin], Pu, NewPu), %supp ds PU
+	suppress([UFMin, [FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin], Pu, _), %supp ds PU
 	insert([UFMin, [FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin],Q,Q1),% AJout le bon elmt dans Q
 	
-	affiche_solution(Q1, Sf, NE).
+	affiche_solution(Q1, Sf, _).
 
 aetoile(Pf, Pu, Q) :-
 	%on cherche et supprime le u de f min
-	recherche_et_suppr_f_u_min(Pf, NewPf, UFMin),
+	recherche_et_suppr_f_u_min(Pf, Pf2, UFMin),
 	 
 	 %on supprime le noeud frère dans Pu
-	suppress([UFMin, [FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin], Pu, NewPu),
+	suppress([UFMin, [FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin], Pu, Pu2),
 	
 	%on cherche les successeurs
 	successeursEtActions(UFMin, SetA),
 	splitSetA(SetA,Successeurs,Actions), 
 	expand(Successeurs, [Fs,Gs,Hs] , Gu),
-	loop_successors(Successeurs, [Fs, Hs, Gs], NewPu, NewPf, Q, Pu1, Pf1, Q1, UFMin, Actions),
+	loop_successors(Successeurs, [Fs, Hs, Gs], Pu2, Pf2, Pu3, Pf3, Q, UFMin, Actions),
 	
 	%U ayant été développé et supprimé de P, il reste à insérer le nœud [U,Val,...,..] dans Q,
-	insert([UFMin,[FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin], Q1, Q2),
-	aetoile(Pf1,Pu1,Q2).
+	insert([UFMin,[FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin], Q, Q2),
+	aetoile(Pf3,Pu3,Q2).
 
 	% PROBLEME IDENTIFIE : EN GROS ON RENTRE DANS AFFICHE SOLUTION ALORS QU'IL NOUS MANQUE A FAIRE VRAIMENT LETAPE FINALE! IL MANQUE UNE DERNIERE ETAPE! LE BELONGS NE MARCHE PAS DU COUP ET FALSE, ALORS QUE UNE ACTION AVANT DE LE ETESTER MARCHERAI ! insere avant le affiche solution le UFMIN dans Q mais du coup voir ce que renvoit rch et supp UF min , valeur de U ou tout le U ? 
    
