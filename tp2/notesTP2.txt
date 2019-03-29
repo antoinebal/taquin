@@ -1,0 +1,12 @@
+situation_initiale(S), joueur_initial(J). -> il n'y a que des variables non liées, x va commencer
+
+(ground(X) vrai si x liée, var(X) vrai si X libre).
+
+situation_initiale(S), nth1(3,S,Lig), nth1(2,Lig,o) -> on récup le 3ème élément de S (Lig), on récup le 2ème élém de Lig et on y met "o".
+
+
+PB : Au niveau de l'heuristique : on obitent 0 et pas 4 ou -4 
+
+Notre heuristique peut marcher (imprécision dans le sujet ) mais a voir, continuer le tp et voir a la fin si marche ou pas  ( explication en maiil normalement ) 
+
+
