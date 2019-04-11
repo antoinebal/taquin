@@ -52,11 +52,6 @@ Predicat principal de l'algorithme :
 recherche_et_suppr_f_u_min(Avl, NewAvl, UFMin):-
 	suppress_min([_,UFMin] , Avl, NewAvl).
 
-%peut etre tout récupérer au lieu de seulement U : suppress_min(UFMin , Avl, NewAvl).
-	
-%pour chaque successeur d’un étatUqui vient d’être développé, test d'appartenanceà P et test d'appartenanceà Q	
-
-
 	
 
 main :-
@@ -76,11 +71,12 @@ main :-
 
 
 %*******************************************************************************
-% fonction utile pour récupérer une liste d'Actions et une liste de Successeurs
-% partir d'une liste de la forme [Successeur, Action]|Reste
+% fonction utile pour récupérer une liste d'Actions et une liste de Successeurs à
+% partir d'une liste d'éléments de la forme [Successeur, Action]
 splitSetA([],[],[]).
 splitSetA([[Hs,Ha]|T], [Hs|LS], [Ha|LA] ) :-
 	 splitSetA(T,LS,LA). 
+
 	
 
 expand(Successeurs, [Fs, Hs, Gs], Gu):- 
@@ -102,7 +98,7 @@ loop_successors([],[[],[],[]],Pu,Pf,Pu,Pf, _, _, _). % y'avait [] pour F,HG et a
 loop_successors([S1|Succ], [[F|Fs], [H|Hs], [G|Gs]], Pu0, Pf0, Pu, Pf, Q, Pere, [Action|Suite]) :-
 	traiter_successeur(S1, [F, H, G], Pu0, Pf0, Pu1, Pf1, Q, Pere, Action),
 	loop_successors(Succ, [Fs, Hs, Gs], Pu1, Pf1, Pu, Pf, Q, Pere, Suite).
-%%
+
 %traiter_successeur(Succ, [F, H, G], Pu0, Pf0, Q0, Pu1, Pf1, Q1, Pere, Action) :-
 %	belongs([Succ, _, _, _], Q0). % ON a deja dev l'etat : on passe au successeur suivant !
 
@@ -162,13 +158,20 @@ compareEtats(Succ, FOld, HOld, _, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Ac
 	
 
 affiche_solution(Q, U, 0):-
-	belongs([U, _, nil, nil], Q),
+	belongs([U, [F, H, G], nil, nil], Q),
+	initial_state(U),
 	writeln("Etat initial : "),
 	affiche_etat(U),
+	write("F = "),
+	write(F),
+	write(" ; H = "),
+	write(H),
+	write(" ; G = "),
+	writeln(G), 
 	writeln("--------------------------------------------------------------------").
-%affiche 
+
 affiche_solution(Q, U, NumeroEtape) :-
-	belongs([U, _, Pere, Action], Q),
+	belongs([U, [F, H, G], Pere, Action], Q),
 	affiche_solution(Q, Pere, NE),
 	NumeroEtape is NE+1,
 	write("Etape "),
@@ -178,9 +181,14 @@ affiche_solution(Q, U, NumeroEtape) :-
 	writeln(Action),
 	writeln("Etat : "),
 	affiche_etat(U),
+	write("F = "),
+	write(F),
+	write(" ; H = "),
+	write(H),
+	write(" ; G = "),
+	writeln(G), 
 	writeln("--------------------------------------------------------------------").
 	
-
 affiche_ligne([]) :-
 	writeln(" | ").
 affiche_ligne([vide|Reste]) :-
@@ -188,6 +196,7 @@ affiche_ligne([vide|Reste]) :-
 	write(" "),
 	affiche_ligne(Reste).
 affiche_ligne([H|Reste]) :-
+	H\=vide,
 	write(" | "),	
 	write(H),	
 	affiche_ligne(Reste).

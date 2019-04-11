@@ -1,0 +1,24 @@
+1. Familiarisation avec le problème du Taquin 3x3
+
+1.2.a
+
+La clause finale qui permettrait de représenter la situation finale du Taquin 4x4 est : 
+
+final_state4x4([[1, 2, 3, 4],
+             [5, 6, 7, 8],
+             [9, 10, 11, 12],
+			[13, 14, 15, vide]]).
+
+A la fin de notre travail, pour éprouver la généricité de notre code, nous avons testé notre algorithme sur une grille 4x4.
+
+
+1.2.b 
+initial_state(Ini), nth1(L,Ini,Ligne), nth1(C,Ligne, d).
+-> Permet de savoir quelles sont les numéros de ligne (L) et de colonne (C) du symbole d sur la grille de la situation Ini.
+
+final_state(Fin), nth1(3,Fin,Ligne), nth1(2,Ligne,P)
+-> Permet de savoir quel est le symbole à la troisième ligne et à la deuxième colonne de la grille de la situation Ini.
+
+1.2.b
+initial_state(Ini), nth1(L,Ini,LigneI), nth1(C,LigneI, a),
+final_state(Fin), nth1(L,Fin,LigneF), nth1(C,LigneF, a).

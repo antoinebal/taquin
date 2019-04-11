@@ -15,46 +15,91 @@
    %********************   
    % format :  initial_state(+State) ou State est une matrice (liste de listes)
    
+initial_state(InitState) :- initial_state3(InitState).
 
-initial_state([ [b, h, c],       % C'EST L'EXEMPLE PRIS EN COURS
+initial_state1([ [b, h, c],       % C'EST L'EXEMPLE PRIS EN COURS
                 [a, f, d],       % 
                 [g,vide,e] ]).   % h1=4,   h2=5,   f*=5
 
 
 
+
+
 % AUTRES EXEMPLES POUR LES TESTS DE  A*
 
-/*
-initial_state([ [ a, b, c],        
+
+initial_state2([ [ a, b, c],        
                 [ g, h, d],
                 [vide,f, e] ]). % h2=2, f*=2
 
-initial_state([ [b, c, d],
+initial_state3([ [b, c, d],
                 [a,vide,g],
                 [f, h, e]  ]). % h2=10 f*=10
 			
-initial_state([ [f, g, a],
+initial_state4([ [f, g, a],
                 [h,vide,b],
                 [d, c, e]  ]). % h2=16, f*=20
 			
-initial_state([ [e, f, g],
+initial_state5([ [e, f, g],
                 [d,vide,h],
                 [c, b, a]  ]). % h2=24, f*=30 
 
-initial_state([ [a, b, c],
+initial_state6([ [a, b, c],
                 [g,vide,d],
                 [h, f, e]]). % etat non connexe avec l'etat final (PAS DE SOLUTION)
-*/  
+ 
 
+
+
+
+/*pour tester les matrices de taille 4*4 (on prend un exemple simple car le cas
+sans solution est fréquent
+  ---------------
+ | a | b | c | d | 
+  ---------------
+ | e | f | g | h | 
+  ---------------
+ | i | j | k |   | 
+  ---------------
+ | m | n | o | l | 
+  ---------------
+*/
+
+
+initial_state4x4([[a, b, c, d],
+             [e, f, g, h],
+             [i, j, k, vide],
+			[m, n, o, l]]).
 
    %******************
    % ETAT FINAL DU JEU
    %******************
    % format :  final_state(+State) ou State est une matrice (liste de listes)
+
+
+final_state(FinalState) :- final_state3x3(FinalState).
+
    
-final_state([[a, b,  c],
+final_state3x3([[a, b,  c],
              [h,vide, d],
              [g, f,  e]]).
+
+
+/*pour tester les matrices de taille 4*4
+  ---------------
+ | a | b | c | d | 
+  ---------------
+ | e | f | g | h | 
+  ---------------
+ | i | j | k | l | 
+  ---------------
+ | m | n | o |   | 
+  ---------------
+*/
+final_state4x4([[a, b, c, d],
+             [e, f, g, h],
+             [i, j, k, l],
+			[m, n, o, vide]]).
 
 			 
    %********************
@@ -85,7 +130,11 @@ rule(left, 1, S1, S2) :-
 rule(right,1, S1, S2) :-
    horizontal_permutation(vide,_X,S1,S2).
 
-% Rajout quand on faisait a* : ermet de renvoyer la liste des successeurs : liste etat atteignables en un coup 
+/*
+Nous avons rajouté cette fonction pendant l'écriture d'A* : 
+elle permet d'obtenir une liste de la forme [Successeur, Action_pour_y_parvenir]
+pour un état S1
+*/
 successeursEtActions(S1, L2) :-
 	findall([S2, Action], rule(Action, 1, S1, S2), L2).
 
@@ -157,7 +206,7 @@ delete(N,X,[Y|L], [Y|R]) :-
 	
 	%coordonnees([L,C], Mat, Elt) :- true.    %********
 											 % A FAIRE
-											 %********
+											%********
 
 											 
    %*************
@@ -175,19 +224,28 @@ heuristique(U,H) :-
    %HEURISTIQUE no 1
    %****************
 
-diff_element(E1, E1, 0).
-diff_element(vide, E2, 0):-
-E2\=vide.  %Si on veut 4 pour heuristique1 on supprime diffelement (E1,vide) et E2/= vide du prochain diff element ou mettre direct 1 ici 
-diff_element(E1, E2, 1):-
-E1\=E2,
-E1\=vide.
-
+/*fonction pour évaluer l'égalité entre deux éléments (diff_element(e1, e2, r)
+	> si e1\=e2 et e1\=vide => r=1
+	> sinon r=0 
+*/
+diff_element(E1,E2,R) :- 
+	( E1\=E2 ->
+ 		(E1\=vide -> 
+			R=1 
+		;
+			R=0)
+	;
+		R=0
+	).
+		
+%les deux lignes sont vides (cas trivial)	
 diff_ligne([], [], 0).
 diff_ligne([E1|L1], [E2|L2], X) :-
 	diff_element(E1, E2, X1),
 	diff_ligne(L1, L2, X2),
 	X is X2+X1.
 	
+%les deux matrices sont vides (cas trivial)
 diff_matrice([], [], 0).
 diff_matrice([L1|M1], [L2|M2], X):-
 	diff_ligne(L1, L2, X1),

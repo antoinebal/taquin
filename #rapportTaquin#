@@ -1,0 +1,56 @@
+1. Familiarisation avec le problème du Taquin 3x3
+
+1.2.a
+
+La clause finale qui permettrait de représenter la situation finale du Taquin 4x4 est : 
+
+final_state4x4([[1, 2, 3, 4],
+             [5, 6, 7, 8],
+             [9, 10, 11, 12],
+			[13, 14, 15, vide]]).
+
+A la fin de notre travail, pour éprouver la généricité de notre code, nous avons testé notre algorithme sur une grille 4x4.
+
+
+1.2.b 
+initial_state(Ini), nth1(L,Ini,Ligne), nth1(C,Ligne, d).
+-> Permet de savoir quelles sont les numéros de ligne (L) et de colonne (C) du symbole d sur la grille de la situation Ini.
+
+final_state(Fin), nth1(3,Fin,Ligne), nth1(2,Ligne,P)
+-> Permet de savoir quel est le symbole à la troisième ligne et à la deuxième colonne de la grille de la situation Ini.
+
+1.2.b
+initial_state(Ini), nth1(L,Ini,LigneI), nth1(C,LigneI, a),
+final_state(Fin), nth1(L,Fin,LigneF), nth1(C,LigneF, a).
+
+1.2.c
+Une requête Prolog qui permet de savoir si une pièce donnée (par exemple a) est bien placé dans l'état initial Ini par rapport à l'état final Fin est :
+
+initial_state(Ini), nth1(L,Ini,LigneI), nth1(C,LigneI, a),
+final_state(Fin), nth1(L,Fin,LigneF), nth1(C,LigneF, a).
+
+Egalement, voici une requête qui nous permettrait de savoir toutes les pièces bien placées dans l'état Ini par rapport à l'état final Fin :
+
+initial_state(Ini), nth1(L,Ini,LigneI), nth1(C,LigneI, P),
+final_state(Fin), nth1(L,F,LigneF), nth1(C,LigneF, P).
+
+1.2.d
+initial_state(Ini),
+rule(Action, 1, Ini, Succ).
+Dans le prédicat rule, Action désigne le mouvement suivi par vide (up, down, left, right), le deuxième argument est le coup (ici chaque action nous coûte 1), et Succ est la variable pouvant prendre la valeur de tous les successeurs possibles.
+
+
+1.2.e
+initial_state(Ini),
+findall(Successeur, rule(Action, 1, Ini, Successeur), Successeurs).
+Le prédicat findall permet de compiler toutes la valeurs que la variable Successeur peut prendre dans une liste Successeurs.
+
+
+1.2.f
+Nous pouvons encore améliorer la requête précédente en associant un successeur à l'action qui a permis de l'atteindre :
+initial_state(Ini),
+findall([Action, Successeur], rule(Action, 1, Ini, Successeur), ActionEtSucc).
+
+
+2. Développement des 2 heuristiques
+
