@@ -111,7 +111,7 @@ loop_successors([S1|Succ], [[F|Fs], [H|Hs], [G|Gs]], Pu0, Pf0, Pu, Pf, Q, Pere, 
 %% 
 traiter_successeur(Succ, [FNew, HNew, GNew], Pu0, Pf0, Pu1, Pf1, Q, Pere, Action) :-
 	(belongs([Succ, _, _, _], Q) -> Pu1 = Pu0 ,
-									Pf1 = Pf0						 %IF ce successeur est connu dans Q, on l'oublie, on renvoi les arbres déjà présents
+									Pf1 = Pf0						 %IF ce successeur est connu dans Q, on l'oublie, on renvoie les arbres déjà présents
 		; %else 
 	 	(belongs([Succ, [FOld,HOld,GOld], _, _],Pu0) -> %if S connu dans Pu -> garde la meilleure eval ds pf et pu 
 								compareEtats(Succ, FOld, HOld, GOld, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Action) 
@@ -189,24 +189,7 @@ affiche_solution(Q, U, NumeroEtape) :-
 	writeln(G), 
 	writeln("--------------------------------------------------------------------").
 	
-affiche_ligne([]) :-
-	writeln(" | ").
-affiche_ligne([vide|Reste]) :-
-	write(" | "),
-	write(" "),
-	affiche_ligne(Reste).
-affiche_ligne([H|Reste]) :-
-	H\=vide,
-	write(" | "),	
-	write(H),	
-	affiche_ligne(Reste).
 
-affiche_etat([]):-
-	writeln("  ------------").
-affiche_etat([Ligne|Reste]) :-
-	writeln("  ------------"),
-	affiche_ligne(Ligne),	
-	affiche_etat(Reste).
 
 aetoile(nil, nil, _) :-       %Cas trivial , Pf et Pu vides 
 	writeln("PAS de SOLUTION: L’ETAT FINAL N’EST PAS ATTEIGNABLE!").

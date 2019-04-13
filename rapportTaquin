@@ -22,3 +22,5 @@ final_state(Fin), nth1(3,Fin,Ligne), nth1(2,Ligne,P)
 1.2.b
 initial_state(Ini), nth1(L,Ini,LigneI), nth1(C,LigneI, a),
 final_state(Fin), nth1(L,Fin,LigneF), nth1(C,LigneF, a).
+
+
