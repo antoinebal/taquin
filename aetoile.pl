@@ -47,12 +47,6 @@ Predicat principal de l'algorithme :
 
 %*******************************************************************************
 
-%recherche et suppression de l‘état Uqui minimise fU)
-%UFMin etat de f minimal 
-recherche_et_suppr_f_u_min(Avl, NewAvl, UFMin):-
-	suppress_min([_,UFMin] , Avl, NewAvl).
-
-	
 
 main :-
 	% initialisations Pf, Pu et Q 
@@ -64,8 +58,7 @@ main :-
 	insert([[H0, H0, 0], S0], Pf0, Pf), % On insère les noeuds initiaux, f=g+H avec g=0
 	insert([S0, [H0, H0, 0], nil, nil], Pu0, Pu),
 	
-	% lancement de Aetoile	
-
+	% lancement de A*
 	aetoile(Pf,Pu,Q).
 
 
@@ -93,45 +86,39 @@ sommeListe([H1|T1], [H2|T2], [H3|T3]) :-
 	H3 is H2+H1,
 	sommeListe(T1, T2, T3).
 
-loop_successors([],[[],[],[]],Pu,Pf,Pu,Pf, _, _, _). % y'avait [] pour F,HG et actions, false direct, avec _ met quelques trucs avant ([[],[],[]] pour F,H,H c'est ok)
+loop_successors([],[[],[],[]],Pu,Pf,Pu,Pf, _, _, _).
 %on a besoin des actions, du pere
 loop_successors([S1|Succ], [[F|Fs], [H|Hs], [G|Gs]], Pu0, Pf0, Pu, Pf, Q, Pere, [Action|Suite]) :-
 	traiter_successeur(S1, [F, H, G], Pu0, Pf0, Pu1, Pf1, Q, Pere, Action),
 	loop_successors(Succ, [Fs, Hs, Gs], Pu1, Pf1, Pu, Pf, Q, Pere, Suite).
 
-%traiter_successeur(Succ, [F, H, G], Pu0, Pf0, Q0, Pu1, Pf1, Q1, Pere, Action) :-
-%	belongs([Succ, _, _, _], Q0). % ON a deja dev l'etat : on passe au successeur suivant !
 
-%traiter_successeur(Succ, [FNew, HNew, GNew], Pu0, Pf0, Q0, Pu1, Pf1, Q1, Pere, Action) :-
-%	belongs([Succ, [FOld,HOld,GOld], _, _],Pu0),
-	%compare les états et met à jour Pu et Pf si cela vaut le coup	
-	%todo : peut être le faire avec un if
-%	compareEtats(Succ, FOld, HOld, GOld, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pu1, Pere, Action).
-
-%% 
 traiter_successeur(Succ, [FNew, HNew, GNew], Pu0, Pf0, Pu1, Pf1, Q, Pere, Action) :-
+	%si le successeur est dans Q, on ignore, les AVL restent les mêmes
 	(belongs([Succ, _, _, _], Q) -> Pu1 = Pu0 ,
-									Pf1 = Pf0						 %IF ce successeur est connu dans Q, on l'oublie, on renvoie les arbres déjà présents
-		; %else 
-	 	(belongs([Succ, [FOld,HOld,GOld], _, _],Pu0) -> %if S connu dans Pu -> garde la meilleure eval ds pf et pu 
-								compareEtats(Succ, FOld, HOld, GOld, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Action) 
-			; %% else des deux du coup , insert ds Pf et pu 
+									Pf1 = Pf0						
+		;  
+	 	(belongs([Succ, [FOld,HOld,_], _, _],Pu0) -> %si est S connu dans Pu on compare et garde la meilleur évaluation 
+								compareEtats(Succ, FOld, HOld, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Action) 
+			; % le successeur n'est connu ni dans Q, ni dans Pu, on l'insère donc dans Pu et Pf
 		insert([Succ,[FNew, HNew, GNew],Pere, Action],Pu0,Pu1),
 		insert([[FNew, HNew, GNew],Succ],Pf0,Pf1)
 			)
 		) .
 
 
-%dans le cas où le nouvel état n'est pas mieux que l'ancien
-compareEtats(_, FOld, _, _, FNew, _, _, Pu0, Pu0, Pf0, Pf0, _, _) :-
+
+
+%dans le cas où le nouvel état n'est pas mieux que l'ancien, les AVL restent inchangés
+compareEtats(_, FOld, _, FNew, _, _, Pu0, Pu0, Pf0, Pf0, _, _) :-
 	FOld < FNew.
 
-%cas où les f sont égaux: on compare les h
-compareEtats(_, FOld, HOld, _, FNew, HNew, _, Pu0, Pu0, Pf0, Pf0, _, _) :-
+%cas où les f sont égaux: on compare les h, ici on garde l'ancienne évaluation
+compareEtats(_, FOld, HOld, FNew, HNew, _, Pu0, Pu0, Pf0, Pf0, _, _) :-
 	FOld == FNew,
 	HOld < HNew.
 
-compareEtats(Succ, FOld, _, _, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Action) :-
+compareEtats(Succ, FOld, _, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Action) :-
 	FOld > FNew,
 	
 	% on le supprime dans Pu et on le remet avec les nouvelles valeurs
@@ -142,7 +129,7 @@ compareEtats(Succ, FOld, _, _, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Actio
 	suppress([_, Succ], Pf0, AuxPf),
 	insert([[FNew, HNew, GNew], Succ], AuxPf, Pf1).
 
-compareEtats(Succ, FOld, HOld, _, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Action) :-
+compareEtats(Succ, FOld, HOld, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Action) :-
 	FOld == FNew,
 	HOld > HNew,
 
@@ -153,8 +140,13 @@ compareEtats(Succ, FOld, HOld, _, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Ac
 	% on le supprime dans Pf et on le remet avec les nouvelles valeurs
 	suppress([_, Succ], Pf0, AuxPf),
 	insert([[FNew, HNew, GNew], Succ], AuxPf, Pf1).
-	
-	
+
+
+%dans le cas où les f et h sont égaux, on choisit le laisser les AVL inchangés
+compareEtats(_, FOld, HOld, FNew, HNew, _, Pu0, Pu0, Pf0, Pf0, _, _) :-
+	FOld == FNew,
+	HOld == HNew,
+	writeln("THE SPECIAL ONE").
 	
 
 affiche_solution(Q, U, 0):-
@@ -167,8 +159,8 @@ affiche_solution(Q, U, 0):-
 	write(" ; H = "),
 	write(H),
 	write(" ; G = "),
-	writeln(G), 
-	writeln("--------------------------------------------------------------------").
+	writeln(G),
+	writeln("***************************").
 
 affiche_solution(Q, U, NumeroEtape) :-
 	belongs([U, [F, H, G], Pere, Action], Q),
@@ -179,7 +171,6 @@ affiche_solution(Q, U, NumeroEtape) :-
 	writeln(" : "),
 	write("Action : "),
 	writeln(Action),
-	writeln("Etat : "),
 	affiche_etat(U),
 	write("F = "),
 	write(F),
@@ -187,26 +178,29 @@ affiche_solution(Q, U, NumeroEtape) :-
 	write(H),
 	write(" ; G = "),
 	writeln(G), 
-	writeln("--------------------------------------------------------------------").
+	writeln("***************************").
 	
 
-
-aetoile(nil, nil, _) :-       %Cas trivial , Pf et Pu vides 
+%Cas trivial , Pf et Pu vides 
+aetoile(nil, nil, _) :-       
 	writeln("PAS de SOLUTION: L’ETAT FINAL N’EST PAS ATTEIGNABLE!").
 
-aetoile(Pf, Pu, Q):-  %cas trivial , solution trouvée et à afficher, le min de Pf vaut l'état final
+%cas trivial , solution trouvée et à afficher, le min de Pf vaut l'état final
+aetoile(Pf, Pu, Q):-  
 	final_state(Sf),
-	recherche_et_suppr_f_u_min(Pf, _, UFMin),
+	suppress_min([_,UFMin], Pf, _),
 	UFMin==Sf,
 
+	%TODO : inutile de le suppr?
 	suppress([UFMin, [FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin], Pu, _), %supp ds PU
 	insert([UFMin, [FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin],Q,Q1),% AJout le bon elmt dans Q
 	
+	writeln("GOT IT!"),
 	affiche_solution(Q1, Sf, _).
 
 aetoile(Pf, Pu, Q) :-
 	%on cherche et supprime le u de f min
-	recherche_et_suppr_f_u_min(Pf, Pf2, UFMin),
+	suppress_min([_,UFMin] , Pf, Pf2),
 	 
 	 %on supprime le noeud frère dans Pu
 	suppress([UFMin, [FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin], Pu, Pu2),
@@ -214,12 +208,11 @@ aetoile(Pf, Pu, Q) :-
 	%on cherche les successeurs
 	successeursEtActions(UFMin, SetA),
 	splitSetA(SetA,Successeurs,Actions), 
-	expand(Successeurs, [Fs,Gs,Hs] , Gu),
+	expand(Successeurs, [Fs,Hs,Gs] , Gu),
 	loop_successors(Successeurs, [Fs, Hs, Gs], Pu2, Pf2, Pu3, Pf3, Q, UFMin, Actions),
 	
 	%U ayant été développé et supprimé de P, il reste à insérer le nœud [U,Val,...,..] dans Q,
 	insert([UFMin,[FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin], Q, Q2),
 	aetoile(Pf3,Pu3,Q2).
 
-	% PROBLEME IDENTIFIE : EN GROS ON RENTRE DANS AFFICHE SOLUTION ALORS QU'IL NOUS MANQUE A FAIRE VRAIMENT LETAPE FINALE! IL MANQUE UNE DERNIERE ETAPE! LE BELONGS NE MARCHE PAS DU COUP ET FALSE, ALORS QUE UNE ACTION AVANT DE LE ETESTER MARCHERAI ! insere avant le affiche solution le UFMIN dans Q mais du coup voir ce que renvoit rch et supp UF min , valeur de U ou tout le U ? 
    
