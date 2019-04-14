@@ -99,14 +99,15 @@ loop_successors([S1|Succ], [[F|Fs], [H|Hs], [G|Gs]], Pu0, Pf0, Pu, Pf, Q, Pere, 
 
 traiter_successeur(Succ, [FNew, HNew, GNew], Pu0, Pf0, Pu1, Pf1, Q, Pere, Action) :-
 	%si le successeur est dans Q, on ignore, les AVL restent les mêmes
+	writeln("traite succ"),
 	(belongs([Succ, _, _, _], Q) -> Pu1 = Pu0 ,
 									Pf1 = Pf0
-									%writeln("Belong to Q")					
+									%writeln("Belong to Q")													
 		;  
 	 	(belongs([Succ, [FOld,HOld,_], _, _],Pu0) -> %si est S connu dans Pu on compare et garde la meilleur évaluation
-								%writeln("Belong to Pu") ,
-								%debug(Succ, FOld, HOld, FNew, HNew, GNew),
-								compareEtats(Succ, FOld, HOld, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Action) 
+								writeln("Belong to Pu") ,
+								debug(Succ, FOld, HOld, FNew, HNew, GNew),
+								compareEtats(Succ, FOld, HOld, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Action)
 			; % le successeur n'est connu ni dans Q, ni dans Pu, on l'insère donc dans Pu et Pf
 		%writeln("Belong to nobody"),
 		insert([Succ,[FNew, HNew, GNew],Pere, Action],Pu0,Pu1),
@@ -127,6 +128,41 @@ debug(Succ, FOld, HOld, FNew, HNew, GNew):-
 	writeln(HNew),
 	writeln("GNew"),
 	writeln(GNew).
+
+compareEtats(_, FOld, HOld, FNew, HNew, _, Pu0, Pu0, Pf0, Pf0, _, _) :-
+	[FOld, HOld] @< [FNew, HNew],
+	writeln("1").
+
+compareEtats(_, FOld, HOld, FNew, HNew, _, Pu0, Pu0, Pf0, Pf0, _, _) :-
+	[FOld, HOld] == [FNew, HNew],
+	writeln("1").
+
+compareEtats(Succ, FOld, _, FNew, HNew, GNew, Pu0, Pu1, Pf0, Pf1, Pere, Action) :-
+		
+	[FNew, HNew] @< [FOld,HOld],
+	%writeln("OK FOld > FNew"),
+	% on le supprime dans Pu et on le remet avec les nouvelles valeurs
+	%put_flat(Pu0),
+	suppress([Succ, [FOld, HOld, GOld], _, _], Pu0, AuxPu),
+	%writeln("OK supress Pu"),
+	%put_flat(AuxPu),
+	insert([Succ, [FNew, HNew, GNew], Pere, Action], AuxPu, Pu1),
+	%writeln("Ok insert Pu"),
+	%put_flat(Pu1),
+	
+	% on le supprime dans Pf et on le remet avec les nouvelles valeurs
+	%put_flat(Pf0),
+	%writeln(Succ),
+
+	suppress([[FOld, HOld,GOld], Succ], Pf0, AuxPf),
+	%belSup(Succ, Pf0, AuxPf),
+
+	%writeln("OK supress Pf"),
+
+	insert([[FNew, HNew, GNew], Succ], AuxPf, Pf1),
+	writeln("3").
+
+/*
 
 %dans le cas où le nouvel état n'est pas mieux que l'ancien, les AVL restent inchangés
 compareEtats(_, FOld, _, FNew, _, _, Pu0, Pu0, Pf0, Pf0, _, _) :-
@@ -193,6 +229,10 @@ compareEtats(_, FOld, HOld, FNew, HNew, _, Pu0, Pu0, Pf0, Pf0, _, _) :-
 	HOld == HNew,
 	writeln("5 THE SPECIAL ONE").
 	
+*/
+
+
+
 
 affiche_solution(Q, U, 0):-
 	belongs([U, [F, H, G], nil, nil], Q),
@@ -241,7 +281,7 @@ aetoile(Pf, Pu, Q):-
 	insert([UFMin, [FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin],Q,Q1),% AJout le bon elmt dans Q
 	
 	%writeln("GOT IT!"),
-	affiche_solution(Q1, Sf, _).
+	affiche_solution(Q1, Sf, _),!.
 
 aetoile(Pf, Pu, Q) :-
 	%on cherche et supprime le u de f min
@@ -249,10 +289,11 @@ aetoile(Pf, Pu, Q) :-
 	 
 	 %on supprime le noeud frère dans Pu
 	suppress([UFMin, [FUFMin,HUFMin,Gu], PereUFMin, ActionUFMin], Pu, Pu2),
+	%not(belongs([UFMin, _, _, _], Q)),
 
 	%TEST
-	%writeln("UFMin trouvé : "),	
-	%affiche_etat(UFMin),
+	writeln("UFMin trouvé : "),	
+	affiche_etat(UFMin),
 	
 	%on cherche les successeurs
 	successeursEtActions(UFMin, SetA),

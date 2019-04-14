@@ -15,7 +15,7 @@
    %********************   
    % format :  initial_state(+State) ou State est une matrice (liste de listes)
    
-initial_state(InitState) :- initial_state3(InitState).
+initial_state(InitState) :- initial_state5(InitState).
 
 initial_state1([ [b, h, c],       % C'EST L'EXEMPLE PRIS EN COURS
                 [a, f, d],       % 
