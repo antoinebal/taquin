@@ -15,14 +15,11 @@
    %********************   
    % format :  initial_state(+State) ou State est une matrice (liste de listes)
    
-initial_state(InitState) :- initial_state5(InitState).
+initial_state(InitState) :- initial_state1(InitState).
 
 initial_state1([ [b, h, c],       % C'EST L'EXEMPLE PRIS EN COURS
                 [a, f, d],       % 
                 [g,vide,e] ]).   % h1=4,   h2=5,   f*=5
-
-
-
 
 
 % AUTRES EXEMPLES POUR LES TESTS DE  A*
@@ -49,9 +46,6 @@ initial_state6([ [a, b, c],
                 [h, f, e]]). % etat non connexe avec l'etat final (PAS DE SOLUTION)
  
 
-
-
-
 /*pour tester les matrices de taille 4*4 (on prend un exemple simple car le cas
 sans solution est fréquent
   ---------------
@@ -64,18 +58,14 @@ sans solution est fréquent
  | m | n | o | l | 
   ---------------
 */
-
-
-initial_state4x4([[1, 2, 3, 4],
-             [5, 6, 7, 8],
-             [9, 10, 11, vide],
-			[13, 14, 15, 12]]).
-
+initial_state4x4([[a, vide, c, d],
+             	[e, b, f, h],
+             	[i, j, g, k],
+				[m, n, o, l]]).
    %******************
    % ETAT FINAL DU JEU
    %******************
    % format :  final_state(+State) ou State est une matrice (liste de listes)
-
 
 final_state(FinalState) :- final_state3x3(FinalState).
 
@@ -87,10 +77,10 @@ final_state3x3([[a, b,  c],
 
 /*pour tester les matrices de taille 4*4
 */
-final_state4x4([[1, 2, 3, 4],
-             [5, 6, 7, 8],
-             [9, 10, 11, 12],
-			[13, 14, 15, vide]]).
+final_state4x4([[a, b, c, d],
+             	[e, f, g, h],
+             	[i, j, k, l],
+				[m, n, o, vide]]).
 
 			 
    %********************
@@ -170,9 +160,7 @@ delete(N,X,[Y|L], [Y|R]) :-
    delete(N1,X,L,R),
    N is N1 + 1.
 
-
-   
-   
+ 
    %*******************
    % PARTIE A COMPLETER
    %*******************
@@ -182,22 +170,11 @@ delete(N,X,[Y|L], [Y|R]) :-
    %*******************************************************************
 	% format : coordonnees(?Coord, +Matrice, ?Element)
 	% Définit la relation entre des coordonnees [Ligne, Colonne] et un element de la matrice
-	/*
-	Exemples
 	
-	?- coordonnees(Coord, [[a,b,c],[d,e,f]],  e).        % quelles sont les coordonnees de e ?
-	Coord = [2,2]
-	yes
-	
-	?- coordonnees([2,3], [[a,b,c],[d,e,f]],  P).        % qui a les coordonnees [2,3] ?
-	P=f
-	yes
-	*/
-
-	
-	%coordonnees([L,C], Mat, Elt) :- true.    %********
-											 % A FAIRE
-											%********
+		
+coordonnees([L,C], Mat, Elt) :-
+	nth1(L, Mat, Row),
+    nth1(C, Row, Elt) .
 
 											 
    %*************
@@ -206,7 +183,7 @@ delete(N,X,[Y|L], [Y|R]) :-
 
 
 heuristique(U,H) :-
-   heuristique1(U, H).  % choisir l'heuristique 
+   heuristique2(U, H).  % choisir l'heuristique 
 %   heuristique2(U, H).   utilisee ( 1 ou 2) 
    
 
@@ -245,73 +222,17 @@ diff_matrice([L1|M1], [L2|M2], X):-
 	X is X2+X1.
 
 
-%clause utile pour l'affichage des tests unitaires
-printTest(Resultat, Resultat, NumeroTest) :-
-	write("TEST No"),
-	write(NumeroTest),
-	write(" : SUCCES ; Calculé = Attendu ; "),
-	writeln(Resultat).
-printTest(ResultatCalcule, ResultatAttendu, NumeroTest) :-
-	ResultatCalcule\=ResultatAttendu,
-	write("TEST No"),
-	write(NumeroTest),
-	write(" : ECHEC ; Calculé != Attendu ; "),
-	write(ResultatCalcule),
-	write("!="),
-	writeln(ResultatAttendu).
-
-testCoincidence(0, F) :-
-	writeln("TEST Coïncidence : SUCCES ; l'heuristique"),
-	writeln("est coïncidente avec comme état final : "),
-	affiche_etat(F).
-
-testCoincidence(H, F) :-
-	H\=0,
-	writeln("TEST Coïncidence : ECHEC ; l'heuristique n'est pas coïncidente avec comme état final : "),
-	affiche_etat(F).
-
-%TEST UNITAIRE HEURISTIQUE 1
-test_heuristique1 :-
-	writeln("*****TEST UNITAIRE DE L'HEURISTIQUE 1*****"),
-	initial_state1(I1),
-	initial_state2(I2),
-	initial_state3(I3),
-	initial_state4(I4),
-	initial_state5(I5),
-	initial_state6(I6),
+% Calcul du nombre de pieces mal placees dans l'etat courant U
+% par rapport a l'etat final F
+heuristique1(U, H) :-    
 	final_state(F),
-
-	heuristique1(I1, HCalcul1),
-	heuristique1(I2, HCalcul2),
-	heuristique1(I3, HCalcul3),
-	heuristique1(I4, HCalcul4),
-	heuristique1(I5, HCalcul5),
-	heuristique1(I6, HCalcul6),
-	heuristique1(F, HCalculF),
-
-	printTest(HCalcul1, 4, 1),
-	printTest(HCalcul2, 2, 2),
-	printTest(HCalcul3, 7, 3),
-	printTest(HCalcul4, 6, 4),
-	printTest(HCalcul5, 8, 5),
-	printTest(HCalcul6, 2, 6),
-
-	testCoincidence(HCalculF, F),
-	writeln("******************************************").
-     
-   % Calcul du nombre de pieces mal placees dans l'etat courant U
-   % par rapport a l'etat final F
-
-    heuristique1(U, H) :-    % Verifier qu'on doit bien trouver 3 , et pas 4 dépend du comptage de mouvement sur le vide ou non 
-		final_state(F),
-		diff_matrice(U, F, H).    
+	diff_matrice(U, F, H).    
 
    %****************
    %HEURISTIQUE no 2
    %****************
    
-   % Somme sur l'ensemble des pieces des distances de Manhattan
-   % entre la position courante de la piece et sa position dans l'etat final
+   
 
 
 /*
@@ -326,22 +247,20 @@ construitliste([H|M], L) :-
 		construitliste(M, L1),
 		append(H, L1, L).
 
-% I et J sont les coordonnées de Value dans la matrice Matrix
-matrix(Matrix, I, J, Value) :-
-    nth1(I, Matrix, Row),
-    nth1(J, Row, Value).
 
 %la distance de Manhattan de vide est nulle peu importe les matrices	
 d_manh(_, _, vide, 0).
 d_manh(M1,M2,Value,DManh) :-
 	Value\=vide, 
 	% on récupère les coordonnées dans M1
-	matrix(M1,X1,Y1,Value), 
+	coordonnees([X1, Y1], M1, Value),
 	% on récupère les coordonnées dans M2
-	matrix(M2,X2,Y2,Value),
+	coordonnees([X2, Y2], M2, Value),
 	% on calcule la distance de Manhattan
 	DManh is (abs(X1-X2)+abs(Y1-Y2)). 
 	
+% Somme sur l'ensemble des pieces des distances de Manhattan
+% entre la position courante de la piece et sa position dans l'etat final
 heuristique2(U, H) :-
 	% on transforme la matrice U en liste pour la parcourir 	
 	construitliste(U, Liste),
@@ -351,36 +270,9 @@ heuristique2(U, H) :-
 	% on somme les éléments de la liste	
 	sumlist(ListeDM, H).
 
-%TEST UNITAIRE HEURISTIQUE 2
-test_heuristique2 :-
-	writeln("*****TEST UNITAIRE DE L'HEURISTIQUE 2*****"),
-	initial_state1(I1),
-	initial_state2(I2),
-	initial_state3(I3),
-	initial_state4(I4),
-	initial_state5(I5),
-	initial_state6(I6),
-	final_state(F),
-
-	heuristique2(I1, HCalcul1),
-	heuristique2(I2, HCalcul2),
-	heuristique2(I3, HCalcul3),
-	heuristique2(I4, HCalcul4),
-	heuristique2(I5, HCalcul5),
-	heuristique2(I6, HCalcul6),
-	heuristique1(F, HCalculF),
-
-	printTest(HCalcul1, 5, 1),
-	printTest(HCalcul2, 2, 2),
-	printTest(HCalcul3, 10, 3),
-	printTest(HCalcul4, 16, 4),
-	printTest(HCalcul5, 24, 5),
-	printTest(HCalcul6, 2, 6),
-
-	testCoincidence(HCalculF, F),
-	writeln("******************************************").	
 
 
+% AFFICHAGE
 affiche_ligne([]) :-
 	writeln(" | ").
 affiche_ligne([vide|Reste]) :-
@@ -393,16 +285,16 @@ affiche_ligne([H|Reste]) :-
 	write(H),	
 	affiche_ligne(Reste).
 
+% Notre prédicat pour afficher un état
 affiche_etat([]):-
-	writeln("  ------------").
+	writeln("  ---------------").
 affiche_etat([Ligne|Reste]) :-
-	writeln("  ------------"),
+	writeln("  ---------------"),
 	affiche_ligne(Ligne),	
 	affiche_etat(Reste).
 
 
-%situation que l'on va développer ensuite (suppress_min existe dejà)
-%recherche_suppression_min_p(P, Q
+
 
 									
 									
